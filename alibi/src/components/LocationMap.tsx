@@ -10,6 +10,8 @@ interface LocationMapProps {
   caseData: CaseData;
 }
 
+const routeColors = ['#F7B731', '#7D5FFF', '#FF6B6B', '#4CD964', '#FAD390', '#65C9FF', '#FFB020', '#C56CF0'];
+
 const formatDistance = (distanceMeters: number) => {
   if (distanceMeters >= 1000) {
     return `${(distanceMeters / 1000).toFixed(distanceMeters % 1000 === 0 ? 0 : 1)} км`;
@@ -55,7 +57,7 @@ export const LocationMap = ({ caseData }: LocationMapProps) => {
           <View style={styles.mapGridHorizontal} />
           <View style={styles.mapGridVertical} />
 
-          {caseData.routes.map((route) => {
+          {caseData.routes.map((route, index) => {
             const from = caseData.locations.find((location) => location.id === route.from);
             const to = caseData.locations.find((location) => location.id === route.to);
 
@@ -69,36 +71,35 @@ export const LocationMap = ({ caseData }: LocationMapProps) => {
             const angle = Math.atan2(dy, dx) * (180 / Math.PI);
             const middleX = (from.x + to.x) / 2;
             const middleY = (from.y + to.y) / 2;
-            const shortTimes = getRouteTimes(route)
-              .map((item) => item.replace('пешком', 'пеш.').replace('машина', 'авто').replace('автобус', 'авт.'))
-              .join(' · ');
+            const color = routeColors[index % routeColors.length];
 
             return (
               <View key={`${route.from}-${route.to}`}>
                 <View
+                  pointerEvents="none"
                   style={[
                     styles.routeLine,
                     {
                       left: `${middleX - length / 2}%`,
                       top: `${middleY}%`,
                       width: `${length}%`,
+                      borderColor: color,
                       transform: [{ rotate: `${angle}deg` }],
                     },
                   ]}
                 />
                 <View
+                  pointerEvents="none"
                   style={[
-                    styles.routeLabel,
+                    styles.routeNumber,
                     {
-                      left: `${Math.max(8, Math.min(78, middleX - 16))}%`,
-                      top: `${Math.max(5, Math.min(88, middleY - 4))}%`,
+                      left: `${Math.max(5, Math.min(91, middleX))}%`,
+                      top: `${Math.max(5, Math.min(91, middleY))}%`,
+                      backgroundColor: color,
                     },
                   ]}
                 >
-                  <Text style={styles.routeLabelDistance}>{formatDistance(route.distanceMeters)}</Text>
-                  <Text style={styles.routeLabelTime} numberOfLines={2}>
-                    {shortTimes}
-                  </Text>
+                  <Text style={styles.routeNumberText}>{index + 1}</Text>
                 </View>
               </View>
             );
@@ -116,7 +117,6 @@ export const LocationMap = ({ caseData }: LocationMapProps) => {
               ]}
             >
               <Text style={styles.decorationIcon}>{decoration.icon}</Text>
-              <Text style={styles.decorationLabel}>{decoration.label}</Text>
             </View>
           ))}
 
@@ -157,11 +157,19 @@ export const LocationMap = ({ caseData }: LocationMapProps) => {
       </Card>
 
       <Text style={styles.sectionTitle}>Маршруты</Text>
-      {routeSummaries.map((route) => (
+      {routeSummaries.map((route, index) => (
         <Card key={`${route.from}-${route.to}`} style={styles.routeCard}>
-          <Text style={styles.routeTitle}>
-            {route.from} → {route.to} · {formatDistance(route.distanceMeters)}
-          </Text>
+          <View style={styles.routeCardHeader}>
+            <View style={[styles.routeCardBadge, { backgroundColor: routeColors[index % routeColors.length] }]}>
+              <Text style={styles.routeCardBadgeText}>{index + 1}</Text>
+            </View>
+            <View style={styles.routeCardText}>
+              <Text style={styles.routeTitle}>
+                {route.from} → {route.to}
+              </Text>
+              <Text style={styles.routeDistance}>{formatDistance(route.distanceMeters)}</Text>
+            </View>
+          </View>
           <Text style={styles.routeText}>{route.minutes}</Text>
           {route.restriction ? <Text style={styles.restriction}>Ограничение: {route.restriction}</Text> : null}
         </Card>
@@ -215,46 +223,46 @@ const styles = StyleSheet.create({
   },
   routeLine: {
     position: 'absolute',
-    borderTopWidth: 2,
+    borderTopWidth: 4,
     borderColor: colors.mapRoute,
-    opacity: 0.6,
+    opacity: 0.78,
     transformOrigin: 'center',
+    zIndex: 1,
   },
-  routeLabel: {
+  routeNumber: {
     position: 'absolute',
-    maxWidth: 118,
-    borderRadius: borderRadius.sm,
-    backgroundColor: 'rgba(16, 24, 39, 0.88)',
-    borderWidth: 1,
-    borderColor: colors.primary,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.xs,
+    width: 24,
+    height: 24,
+    marginLeft: -12,
+    marginTop: -12,
+    borderRadius: borderRadius.pill,
+    borderWidth: 2,
+    borderColor: colors.background,
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 2,
   },
-  routeLabelDistance: {
+  routeNumberText: {
     ...typography.caption,
-    color: colors.primary,
+    color: colors.background,
     fontWeight: '900',
-  },
-  routeLabelTime: {
-    ...typography.caption,
-    color: colors.text,
-    fontSize: 11,
-    lineHeight: 14,
   },
   decoration: {
     position: 'absolute',
+    width: 28,
+    height: 28,
+    borderRadius: borderRadius.pill,
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+    borderWidth: 1,
+    borderColor: colors.line,
     alignItems: 'center',
+    justifyContent: 'center',
     transform: [{ translateX: -18 }, { translateY: -18 }],
-    opacity: 0.9,
+    opacity: 0.78,
+    zIndex: 3,
   },
   decorationIcon: {
-    fontSize: 20,
-  },
-  decorationLabel: {
-    ...typography.caption,
-    color: colors.mutedText,
-    fontSize: 10,
-    lineHeight: 12,
+    fontSize: 17,
   },
   location: {
     position: 'absolute',
@@ -269,6 +277,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     padding: spacing.xs,
+    zIndex: 4,
   },
   selectedLocation: {
     borderColor: colors.primary,
@@ -306,10 +315,35 @@ const styles = StyleSheet.create({
   routeCard: {
     padding: spacing.md,
   },
+  routeCardHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+  },
+  routeCardBadge: {
+    width: 32,
+    height: 32,
+    borderRadius: borderRadius.pill,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  routeCardBadgeText: {
+    ...typography.body,
+    color: colors.background,
+    fontWeight: '900',
+  },
+  routeCardText: {
+    flex: 1,
+  },
   routeTitle: {
     ...typography.body,
     color: colors.text,
     fontWeight: '800',
+  },
+  routeDistance: {
+    ...typography.caption,
+    color: colors.mutedText,
+    marginTop: spacing.xs,
   },
   routeText: {
     ...typography.caption,
