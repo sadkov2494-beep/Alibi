@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import Svg, { Line } from 'react-native-svg';
 
 import { borderRadius, colors, spacing, typography } from '../theme';
 import { CaseData, Route } from '../types';
@@ -57,6 +58,34 @@ export const LocationMap = ({ caseData }: LocationMapProps) => {
           <View style={styles.mapGridHorizontal} />
           <View style={styles.mapGridVertical} />
 
+          <Svg pointerEvents="none" style={styles.routeLayer}>
+            {caseData.routes.map((route, index) => {
+              const from = caseData.locations.find((location) => location.id === route.from);
+              const to = caseData.locations.find((location) => location.id === route.to);
+
+              if (!from || !to) {
+                return null;
+              }
+
+              const color = routeColors[index % routeColors.length];
+
+              return (
+                <Line
+                  key={`${route.from}-${route.to}`}
+                  x1={`${from.x}%`}
+                  y1={`${from.y}%`}
+                  x2={`${to.x}%`}
+                  y2={`${to.y}%`}
+                  stroke={color}
+                  strokeWidth={4}
+                  strokeLinecap="round"
+                  strokeDasharray={route.restriction ? '8 6' : undefined}
+                  opacity={0.82}
+                />
+              );
+            })}
+          </Svg>
+
           {caseData.routes.map((route, index) => {
             const from = caseData.locations.find((location) => location.id === route.from);
             const to = caseData.locations.find((location) => location.id === route.to);
@@ -65,29 +94,12 @@ export const LocationMap = ({ caseData }: LocationMapProps) => {
               return null;
             }
 
-            const dx = to.x - from.x;
-            const dy = to.y - from.y;
-            const length = Math.max(Math.sqrt(dx * dx + dy * dy), 8);
-            const angle = Math.atan2(dy, dx) * (180 / Math.PI);
             const middleX = (from.x + to.x) / 2;
             const middleY = (from.y + to.y) / 2;
             const color = routeColors[index % routeColors.length];
 
             return (
-              <View key={`${route.from}-${route.to}`}>
-                <View
-                  pointerEvents="none"
-                  style={[
-                    styles.routeLine,
-                    {
-                      left: `${middleX - length / 2}%`,
-                      top: `${middleY}%`,
-                      width: `${length}%`,
-                      borderColor: color,
-                      transform: [{ rotate: `${angle}deg` }],
-                    },
-                  ]}
-                />
+              <View key={`${route.from}-${route.to}`} pointerEvents="none">
                 <View
                   pointerEvents="none"
                   style={[
@@ -183,7 +195,9 @@ const styles = StyleSheet.create({
     gap: spacing.md,
   },
   mapCanvas: {
-    height: 380,
+    width: '100%',
+    aspectRatio: 1,
+    maxHeight: 340,
     borderRadius: borderRadius.lg,
     backgroundColor: colors.backgroundSoft,
     overflow: 'hidden',
@@ -221,12 +235,8 @@ const styles = StyleSheet.create({
     backgroundColor: colors.line,
     opacity: 0.35,
   },
-  routeLine: {
-    position: 'absolute',
-    borderTopWidth: 4,
-    borderColor: colors.mapRoute,
-    opacity: 0.78,
-    transformOrigin: 'center',
+  routeLayer: {
+    ...StyleSheet.absoluteFillObject,
     zIndex: 1,
   },
   routeNumber: {
@@ -249,27 +259,27 @@ const styles = StyleSheet.create({
   },
   decoration: {
     position: 'absolute',
-    width: 28,
-    height: 28,
+    width: 24,
+    height: 24,
     borderRadius: borderRadius.pill,
     backgroundColor: 'rgba(255, 255, 255, 0.08)',
     borderWidth: 1,
     borderColor: colors.line,
     alignItems: 'center',
     justifyContent: 'center',
-    transform: [{ translateX: -18 }, { translateY: -18 }],
+    transform: [{ translateX: -12 }, { translateY: -12 }],
     opacity: 0.78,
     zIndex: 3,
   },
   decorationIcon: {
-    fontSize: 17,
+    fontSize: 15,
   },
   location: {
     position: 'absolute',
-    width: 86,
-    minHeight: 62,
-    marginLeft: -43,
-    marginTop: -31,
+    width: 78,
+    minHeight: 56,
+    marginLeft: -39,
+    marginTop: -28,
     borderRadius: borderRadius.md,
     backgroundColor: colors.surfaceLight,
     borderWidth: 2,
@@ -293,6 +303,8 @@ const styles = StyleSheet.create({
   locationText: {
     ...typography.caption,
     color: colors.text,
+    fontSize: 11,
+    lineHeight: 14,
     textAlign: 'center',
     fontWeight: '800',
   },
@@ -313,7 +325,7 @@ const styles = StyleSheet.create({
     color: colors.text,
   },
   routeCard: {
-    padding: spacing.md,
+    padding: spacing.sm,
   },
   routeCardHeader: {
     flexDirection: 'row',
@@ -321,8 +333,8 @@ const styles = StyleSheet.create({
     gap: spacing.md,
   },
   routeCardBadge: {
-    width: 32,
-    height: 32,
+    width: 28,
+    height: 28,
     borderRadius: borderRadius.pill,
     alignItems: 'center',
     justifyContent: 'center',

@@ -1,6 +1,7 @@
 import { StatusBar } from 'expo-status-bar';
 import { useMemo, useState } from 'react';
-import { ActivityIndicator, SafeAreaView, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
 import { cases, getCaseById, getNextCaseId } from './src/data/cases';
 import { useProgress } from './src/state/useProgress';
@@ -121,10 +122,12 @@ export default function App() {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <View style={styles.appShell}>{renderScreen()}</View>
-      <StatusBar style="light" />
-    </SafeAreaView>
+    <SafeAreaProvider>
+      <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right', 'bottom']}>
+        <View style={styles.appShell}>{renderScreen()}</View>
+        <StatusBar style="light" />
+      </SafeAreaView>
+    </SafeAreaProvider>
   );
 }
 
@@ -136,7 +139,8 @@ const styles = StyleSheet.create({
   appShell: {
     flex: 1,
     paddingHorizontal: spacing.lg,
-    paddingTop: spacing.md,
+    paddingTop: spacing.sm,
+    paddingBottom: spacing.sm,
   },
   loading: {
     flex: 1,
