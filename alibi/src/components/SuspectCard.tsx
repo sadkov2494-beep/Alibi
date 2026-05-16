@@ -1,5 +1,6 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { Image, StyleSheet, Text, View } from 'react-native';
 
+import { getCharacterPortrait } from '../data/characterPortraits';
 import { borderRadius, colors, spacing, typography } from '../theme';
 import { Suspect } from '../types';
 import { transportLabels } from '../utils/format';
@@ -9,12 +10,19 @@ interface SuspectCardProps {
   suspect: Suspect;
 }
 
-export const SuspectCard = ({ suspect }: SuspectCardProps) => (
-  <Card>
-    <View style={styles.header}>
-      <View style={styles.portrait}>
-        <Text style={styles.portraitText}>{suspect.portrait}</Text>
-      </View>
+export const SuspectCard = ({ suspect }: SuspectCardProps) => {
+  const portraitSource = getCharacterPortrait(suspect.portrait);
+
+  return (
+    <Card>
+      <View style={styles.header}>
+        <View style={styles.portrait}>
+          {portraitSource ? (
+            <Image source={portraitSource} style={styles.portraitImage} resizeMode="cover" />
+          ) : (
+            <Text style={styles.portraitText}>{suspect.portrait}</Text>
+          )}
+        </View>
       <View style={styles.headerText}>
         <Text style={styles.name}>{suspect.name}</Text>
         <Text style={styles.role}>{suspect.role}</Text>
@@ -42,8 +50,9 @@ export const SuspectCard = ({ suspect }: SuspectCardProps) => (
         • {note}
       </Text>
     ))}
-  </Card>
-);
+    </Card>
+  );
+};
 
 const styles = StyleSheet.create({
   header: {
@@ -53,14 +62,19 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md,
   },
   portrait: {
-    width: 58,
-    height: 58,
+    width: 70,
+    height: 70,
     borderRadius: borderRadius.lg,
     backgroundColor: colors.backgroundSoft,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 2,
     borderColor: colors.primary,
+    overflow: 'hidden',
+  },
+  portraitImage: {
+    width: '100%',
+    height: '100%',
   },
   portraitText: {
     fontSize: 30,

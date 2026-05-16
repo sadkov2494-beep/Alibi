@@ -33,12 +33,21 @@ export interface Location {
 export interface Route {
   from: string;
   to: string;
+  distanceMeters: number;
   walkMinutes?: number;
   carMinutes?: number;
   busMinutes?: number;
   metroMinutes?: number;
   taxiMinutes?: number;
   restriction?: string;
+}
+
+export interface MapDecoration {
+  id: string;
+  icon: string;
+  label: string;
+  x: number;
+  y: number;
 }
 
 export interface TimelineEvent {
@@ -85,6 +94,7 @@ export interface CaseData {
   suspects: Suspect[];
   locations: Location[];
   routes: Route[];
+  mapDecorations?: MapDecoration[];
   timelineEvents: TimelineEvent[];
   clues: Clue[];
   weapons: Weapon[];

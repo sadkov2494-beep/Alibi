@@ -2,13 +2,30 @@ import { useMemo, useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 import { borderRadius, colors, spacing, typography } from '../theme';
-import { CaseData } from '../types';
+import { CaseData, Route } from '../types';
 import { transportLabels } from '../utils/format';
 import { Card } from './Card';
 
 interface LocationMapProps {
   caseData: CaseData;
 }
+
+const formatDistance = (distanceMeters: number) => {
+  if (distanceMeters >= 1000) {
+    return `${(distanceMeters / 1000).toFixed(distanceMeters % 1000 === 0 ? 0 : 1)} км`;
+  }
+
+  return `${distanceMeters} м`;
+};
+
+const getRouteTimes = (route: Route) =>
+  [
+    route.walkMinutes ? `${transportLabels.walk}: ${route.walkMinutes} мин` : null,
+    route.carMinutes ? `${transportLabels.car}: ${route.carMinutes} мин` : null,
+    route.busMinutes ? `${transportLabels.bus}: ${route.busMinutes} мин` : null,
+    route.metroMinutes ? `${transportLabels.metro}: ${route.metroMinutes} мин` : null,
+    route.taxiMinutes ? `${transportLabels.taxi}: ${route.taxiMinutes} мин` : null,
+  ].filter(Boolean) as string[];
 
 export const LocationMap = ({ caseData }: LocationMapProps) => {
   const [selectedLocationId, setSelectedLocationId] = useState(caseData.crimeLocationId);
@@ -19,15 +36,7 @@ export const LocationMap = ({ caseData }: LocationMapProps) => {
       caseData.routes.map((route) => {
         const from = caseData.locations.find((location) => location.id === route.from)?.name ?? route.from;
         const to = caseData.locations.find((location) => location.id === route.to)?.name ?? route.to;
-        const minutes = [
-          route.walkMinutes ? `${transportLabels.walk}: ${route.walkMinutes} мин` : null,
-          route.carMinutes ? `${transportLabels.car}: ${route.carMinutes} мин` : null,
-          route.busMinutes ? `${transportLabels.bus}: ${route.busMinutes} мин` : null,
-          route.metroMinutes ? `${transportLabels.metro}: ${route.metroMinutes} мин` : null,
-          route.taxiMinutes ? `${transportLabels.taxi}: ${route.taxiMinutes} мин` : null,
-        ]
-          .filter(Boolean)
-          .join(' · ');
+        const minutes = getRouteTimes(route).join(' · ');
 
         return { ...route, from, to, minutes };
       }),
@@ -37,7 +46,15 @@ export const LocationMap = ({ caseData }: LocationMapProps) => {
   return (
     <View style={styles.wrap}>
       <Card>
+        <View style={styles.mapHeader}>
+          <Text style={styles.mapTitle}>Схема района</Text>
+          <Text style={styles.mapLegend}>Линии показывают расстояние и доступное время пути</Text>
+        </View>
+
         <View style={styles.mapCanvas}>
+          <View style={styles.mapGridHorizontal} />
+          <View style={styles.mapGridVertical} />
+
           {caseData.routes.map((route) => {
             const from = caseData.locations.find((location) => location.id === route.from);
             const to = caseData.locations.find((location) => location.id === route.to);
@@ -46,26 +63,62 @@ export const LocationMap = ({ caseData }: LocationMapProps) => {
               return null;
             }
 
-            const left = Math.min(from.x, to.x);
-            const top = Math.min(from.y, to.y);
-            const width = Math.max(Math.abs(from.x - to.x), 8);
-            const height = Math.max(Math.abs(from.y - to.y), 8);
+            const dx = to.x - from.x;
+            const dy = to.y - from.y;
+            const length = Math.max(Math.sqrt(dx * dx + dy * dy), 8);
+            const angle = Math.atan2(dy, dx) * (180 / Math.PI);
+            const middleX = (from.x + to.x) / 2;
+            const middleY = (from.y + to.y) / 2;
+            const shortTimes = getRouteTimes(route)
+              .map((item) => item.replace('пешком', 'пеш.').replace('машина', 'авто').replace('автобус', 'авт.'))
+              .join(' · ');
 
             return (
-              <View
-                key={`${route.from}-${route.to}`}
-                style={[
-                  styles.routeLine,
-                  {
-                    left: `${left}%`,
-                    top: `${top}%`,
-                    width: `${width}%`,
-                    height: `${height}%`,
-                  },
-                ]}
-              />
+              <View key={`${route.from}-${route.to}`}>
+                <View
+                  style={[
+                    styles.routeLine,
+                    {
+                      left: `${middleX - length / 2}%`,
+                      top: `${middleY}%`,
+                      width: `${length}%`,
+                      transform: [{ rotate: `${angle}deg` }],
+                    },
+                  ]}
+                />
+                <View
+                  style={[
+                    styles.routeLabel,
+                    {
+                      left: `${Math.max(8, Math.min(78, middleX - 16))}%`,
+                      top: `${Math.max(5, Math.min(88, middleY - 4))}%`,
+                    },
+                  ]}
+                >
+                  <Text style={styles.routeLabelDistance}>{formatDistance(route.distanceMeters)}</Text>
+                  <Text style={styles.routeLabelTime} numberOfLines={2}>
+                    {shortTimes}
+                  </Text>
+                </View>
+              </View>
             );
           })}
+
+          {caseData.mapDecorations?.map((decoration) => (
+            <View
+              key={decoration.id}
+              style={[
+                styles.decoration,
+                {
+                  left: `${decoration.x}%`,
+                  top: `${decoration.y}%`,
+                },
+              ]}
+            >
+              <Text style={styles.decorationIcon}>{decoration.icon}</Text>
+              <Text style={styles.decorationLabel}>{decoration.label}</Text>
+            </View>
+          ))}
 
           {caseData.locations.map((location) => {
             const isCrime = location.id === caseData.crimeLocationId;
@@ -107,7 +160,7 @@ export const LocationMap = ({ caseData }: LocationMapProps) => {
       {routeSummaries.map((route) => (
         <Card key={`${route.from}-${route.to}`} style={styles.routeCard}>
           <Text style={styles.routeTitle}>
-            {route.from} → {route.to}
+            {route.from} → {route.to} · {formatDistance(route.distanceMeters)}
           </Text>
           <Text style={styles.routeText}>{route.minutes}</Text>
           {route.restriction ? <Text style={styles.restriction}>Ограничение: {route.restriction}</Text> : null}
@@ -122,18 +175,86 @@ const styles = StyleSheet.create({
     gap: spacing.md,
   },
   mapCanvas: {
-    height: 320,
+    height: 380,
     borderRadius: borderRadius.lg,
     backgroundColor: colors.backgroundSoft,
     overflow: 'hidden',
     position: 'relative',
+    borderWidth: 1,
+    borderColor: colors.line,
+  },
+  mapHeader: {
+    marginBottom: spacing.md,
+  },
+  mapTitle: {
+    ...typography.h2,
+    color: colors.text,
+  },
+  mapLegend: {
+    ...typography.caption,
+    color: colors.mutedText,
+    marginTop: spacing.xs,
+  },
+  mapGridHorizontal: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    top: '50%',
+    height: 1,
+    backgroundColor: colors.line,
+    opacity: 0.35,
+  },
+  mapGridVertical: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    left: '50%',
+    width: 1,
+    backgroundColor: colors.line,
+    opacity: 0.35,
   },
   routeLine: {
     position: 'absolute',
     borderTopWidth: 2,
     borderColor: colors.mapRoute,
-    opacity: 0.45,
-    transform: [{ rotate: '-18deg' }],
+    opacity: 0.6,
+    transformOrigin: 'center',
+  },
+  routeLabel: {
+    position: 'absolute',
+    maxWidth: 118,
+    borderRadius: borderRadius.sm,
+    backgroundColor: 'rgba(16, 24, 39, 0.88)',
+    borderWidth: 1,
+    borderColor: colors.primary,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.xs,
+  },
+  routeLabelDistance: {
+    ...typography.caption,
+    color: colors.primary,
+    fontWeight: '900',
+  },
+  routeLabelTime: {
+    ...typography.caption,
+    color: colors.text,
+    fontSize: 11,
+    lineHeight: 14,
+  },
+  decoration: {
+    position: 'absolute',
+    alignItems: 'center',
+    transform: [{ translateX: -18 }, { translateY: -18 }],
+    opacity: 0.9,
+  },
+  decorationIcon: {
+    fontSize: 20,
+  },
+  decorationLabel: {
+    ...typography.caption,
+    color: colors.mutedText,
+    fontSize: 10,
+    lineHeight: 12,
   },
   location: {
     position: 'absolute',

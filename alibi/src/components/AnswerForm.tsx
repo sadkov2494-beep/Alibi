@@ -1,5 +1,6 @@
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
+import { getCharacterPortrait } from '../data/characterPortraits';
 import { borderRadius, colors, spacing, typography } from '../theme';
 import { CaseData } from '../types';
 import { Button } from './Button';
@@ -26,17 +27,25 @@ export const AnswerForm = ({
     <Card>
       <Text style={styles.title}>Кто мог совершить преступление?</Text>
       <View style={styles.options}>
-        {caseData.suspects.map((suspect) => (
-          <TouchableOpacity
-            key={suspect.id}
-            activeOpacity={0.82}
-            onPress={() => onSelectSuspect(suspect.id)}
-            style={[styles.option, selectedSuspectId === suspect.id && styles.selectedOption]}
-          >
-            <Text style={styles.optionIcon}>{suspect.portrait}</Text>
-            <Text style={styles.optionText}>{suspect.name}</Text>
-          </TouchableOpacity>
-        ))}
+        {caseData.suspects.map((suspect) => {
+          const portraitSource = getCharacterPortrait(suspect.portrait);
+
+          return (
+            <TouchableOpacity
+              key={suspect.id}
+              activeOpacity={0.82}
+              onPress={() => onSelectSuspect(suspect.id)}
+              style={[styles.option, selectedSuspectId === suspect.id && styles.selectedOption]}
+            >
+              {portraitSource ? (
+                <Image source={portraitSource} style={styles.optionImage} resizeMode="cover" />
+              ) : (
+                <Text style={styles.optionIcon}>{suspect.portrait}</Text>
+              )}
+              <Text style={styles.optionText}>{suspect.name}</Text>
+            </TouchableOpacity>
+          );
+        })}
       </View>
     </Card>
 
@@ -95,6 +104,13 @@ const styles = StyleSheet.create({
   },
   optionIcon: {
     fontSize: 26,
+  },
+  optionImage: {
+    width: 42,
+    height: 42,
+    borderRadius: borderRadius.md,
+    borderWidth: 2,
+    borderColor: colors.primary,
   },
   optionText: {
     ...typography.body,
