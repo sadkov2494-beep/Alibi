@@ -1,4 +1,4 @@
-import { Modal, StyleSheet, Text, View } from 'react-native';
+import { Modal, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { colors, spacing, typography } from '../theme';
 import { CaseData } from '../types';
@@ -20,29 +20,31 @@ export const ResultModal = ({ visible, isCorrect, stars, caseData, hintsUsed, on
   <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
     <View style={styles.backdrop}>
       <Card style={styles.modal}>
-        <Text style={[styles.title, isCorrect ? styles.success : styles.danger]}>{isCorrect ? 'Верно!' : 'Есть противоречие'}</Text>
-        {isCorrect ? (
-          <>
-            <StarsRating stars={stars} />
-            <Text style={styles.text}>{caseData.explanation}</Text>
-            <Text style={styles.subtitle}>Кто исключается</Text>
-            {caseData.exclusions.map((exclusion) => {
-              const suspect = caseData.suspects.find((item) => item.id === exclusion.suspectId);
-              return (
-                <Text key={exclusion.suspectId} style={styles.exclusion}>
-                  • {suspect?.name}: {exclusion.reason}
-                </Text>
-              );
-            })}
-            <Text style={styles.footerText}>Использовано подсказок: {hintsUsed}</Text>
-            <Button title={onNext ? 'Следующее дело' : 'Вернуться'} onPress={onNext ?? onClose} />
-          </>
-        ) : (
-          <>
-            <Text style={styles.text}>В этой версии есть противоречие. Проверь временную шкалу, маршруты и способ убийства.</Text>
-            <Button title="Продолжить расследование" onPress={onClose} variant="secondary" />
-          </>
-        )}
+        <ScrollView contentContainerStyle={styles.modalContent}>
+          <Text style={[styles.title, isCorrect ? styles.success : styles.danger]}>{isCorrect ? 'Верно!' : 'Есть противоречие'}</Text>
+          {isCorrect ? (
+            <>
+              <StarsRating stars={stars} />
+              <Text style={styles.text}>{caseData.explanation}</Text>
+              <Text style={styles.subtitle}>Кто исключается</Text>
+              {caseData.exclusions.map((exclusion) => {
+                const suspect = caseData.suspects.find((item) => item.id === exclusion.suspectId);
+                return (
+                  <Text key={exclusion.suspectId} style={styles.exclusion}>
+                    • {suspect?.name}: {exclusion.reason}
+                  </Text>
+                );
+              })}
+              <Text style={styles.footerText}>Использовано подсказок: {hintsUsed}</Text>
+              <Button title={onNext ? 'Следующее дело' : 'Вернуться'} onPress={onNext ?? onClose} />
+            </>
+          ) : (
+            <>
+              <Text style={styles.text}>В этой версии есть противоречие. Проверь временную шкалу, маршруты и способ убийства.</Text>
+              <Button title="Продолжить расследование" onPress={onClose} variant="secondary" />
+            </>
+          )}
+        </ScrollView>
       </Card>
     </View>
   </Modal>
@@ -59,6 +61,8 @@ const styles = StyleSheet.create({
   modal: {
     width: '100%',
     maxHeight: '86%',
+  },
+  modalContent: {
     gap: spacing.md,
   },
   title: {
