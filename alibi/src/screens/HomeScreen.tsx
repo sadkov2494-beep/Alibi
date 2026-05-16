@@ -18,7 +18,7 @@ export const HomeScreen = ({ hintsAvailable, onPlay, onChapters, onSettings, onS
     <View style={styles.hero}>
       <Text style={styles.badge}>cozy mystery</Text>
       <Text style={styles.title}>Алиби</Text>
-      <Text style={styles.subtitle}>Одна большая детективная история о фиолетовых приглашениях, минутах, маршрутах и слишком удобных алиби.</Text>
+      <Text style={styles.subtitle}>Одна большая детективная история о фиолетовых приглашениях, ложных признаниях и слишком удобных алиби.</Text>
     </View>
 
     <Card style={styles.detectiveCard}>

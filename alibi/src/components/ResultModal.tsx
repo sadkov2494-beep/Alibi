@@ -42,7 +42,7 @@ export const ResultModal = ({ visible, isCorrect, stars, caseData, hintsUsed, on
             </>
           ) : (
             <>
-              <Text style={styles.text}>В этой версии есть противоречие. Проверь временную шкалу, маршруты и способ убийства.</Text>
+              <Text style={styles.text}>В этой версии есть противоречие. Проверь показания, улики, временную шкалу и способ убийства.</Text>
               <Button title="Продолжить расследование" onPress={onClose} variant="secondary" />
             </>
           )}

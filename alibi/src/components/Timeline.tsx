@@ -16,6 +16,7 @@ const typeLabels = {
   camera: 'Камера',
   transport: 'Транспорт',
   call: 'Звонок',
+  message: 'Сообщение',
   clue: 'Улика',
   alibi: 'Алиби',
   receipt: 'Чек',

@@ -6,7 +6,7 @@ import { Button } from '../components/Button';
 import { Card } from '../components/Card';
 import { ClueList } from '../components/ClueList';
 import { HintPanel } from '../components/HintPanel';
-import { LocationMap } from '../components/LocationMap';
+import { InvestigationBoard } from '../components/InvestigationBoard';
 import { ResultModal } from '../components/ResultModal';
 import { SuspectCard } from '../components/SuspectCard';
 import { Timeline } from '../components/Timeline';
@@ -14,7 +14,7 @@ import { colors, spacing, typography } from '../theme';
 import { CaseData } from '../types';
 import { calculateStars } from '../utils/progress';
 
-type InvestigationTab = 'suspects' | 'map' | 'time' | 'clues' | 'answer';
+type InvestigationTab = 'suspects' | 'board' | 'time' | 'clues' | 'answer';
 
 interface InvestigationScreenProps {
   caseData: CaseData;
@@ -28,7 +28,7 @@ interface InvestigationScreenProps {
 
 const tabs: Array<{ id: InvestigationTab; title: string }> = [
   { id: 'suspects', title: 'Подозреваемые' },
-  { id: 'map', title: 'Карта' },
+  { id: 'board', title: 'Доска' },
   { id: 'time', title: 'Время' },
   { id: 'clues', title: 'Улики' },
   { id: 'answer', title: 'Ответ' },
@@ -102,7 +102,7 @@ export const InvestigationScreen = ({
           <Card highlighted>
             <Text style={styles.cardTitle}>Цель расследования</Text>
             <Text style={styles.bodyText}>
-              Преступление произошло в {caseData.crimeTime} в локации «{crimeLocation?.name}». Проверь, кто мог добраться туда вовремя и каким способом.
+              Преступление произошло в {caseData.crimeTime} в локации «{crimeLocation?.name}». Ищи противоречия: кто солгал, кто подделал деталь и кому выгодна большая игра.
             </Text>
           </Card>
           {caseData.suspects.map((suspect) => (
@@ -112,8 +112,8 @@ export const InvestigationScreen = ({
       );
     }
 
-    if (activeTab === 'map') {
-      return <LocationMap caseData={caseData} />;
+    if (activeTab === 'board') {
+      return <InvestigationBoard caseData={caseData} />;
     }
 
     if (activeTab === 'time') {

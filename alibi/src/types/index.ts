@@ -51,13 +51,22 @@ export interface MapDecoration {
   y: number;
 }
 
+export type CaseThreadType = 'mystery' | 'contradiction' | 'secret' | 'connection' | 'twist';
+
+export interface CaseThread {
+  id: string;
+  type: CaseThreadType;
+  title: string;
+  text: string;
+}
+
 export interface TimelineEvent {
   id: string;
   time: string;
   suspectId?: string;
   locationId: string;
   text: string;
-  type: 'crime' | 'witness' | 'camera' | 'transport' | 'call' | 'clue' | 'alibi' | 'receipt';
+  type: 'crime' | 'witness' | 'camera' | 'transport' | 'call' | 'message' | 'clue' | 'alibi' | 'receipt';
 }
 
 export interface Clue {
@@ -98,6 +107,7 @@ export interface CaseData {
   locations: Location[];
   routes: Route[];
   mapDecorations?: MapDecoration[];
+  caseThreads: CaseThread[];
   timelineEvents: TimelineEvent[];
   clues: Clue[];
   weapons: Weapon[];
