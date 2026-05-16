@@ -26,6 +26,8 @@ export const ResultModal = ({ visible, isCorrect, stars, caseData, hintsUsed, on
             <>
               <StarsRating stars={stars} />
               <Text style={styles.text}>{caseData.explanation}</Text>
+              <Text style={styles.subtitle}>Нить сюжета</Text>
+              <Text style={styles.text}>{caseData.storyAftermath}</Text>
               <Text style={styles.subtitle}>Кто исключается</Text>
               {caseData.exclusions.map((exclusion) => {
                 const suspect = caseData.suspects.find((item) => item.id === exclusion.suspectId);

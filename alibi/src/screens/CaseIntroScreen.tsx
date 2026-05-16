@@ -24,6 +24,11 @@ export const CaseIntroScreen = ({ caseData, onBack, onStartInvestigation }: Case
         <Text style={styles.description}>{caseData.description}</Text>
       </View>
 
+      <Card highlighted>
+        <Text style={styles.cardTitle}>Нить сюжета</Text>
+        <Text style={styles.storyText}>{caseData.storyContext}</Text>
+      </Card>
+
       <Card>
         <Text style={styles.cardTitle}>Сводка преступления</Text>
         <View style={styles.factRow}>
@@ -111,5 +116,9 @@ const styles = StyleSheet.create({
     ...typography.body,
     color: colors.text,
     marginTop: spacing.xs,
+  },
+  storyText: {
+    ...typography.body,
+    color: colors.text,
   },
 });

@@ -32,6 +32,7 @@ export const ChapterSelectScreen = ({ progress, onBack, onOpenCase }: ChapterSel
             <View style={styles.chapterText}>
               <Text style={styles.chapterTitle}>{chapter.title}</Text>
               <Text style={styles.description}>{chapter.description}</Text>
+              {chapter.storyIntro ? <Text style={styles.storyIntro}>{chapter.storyIntro}</Text> : null}
               <Text style={styles.progress}>
                 Прогресс: {completedCount}/{chapterCases.length}
               </Text>
@@ -109,6 +110,14 @@ const styles = StyleSheet.create({
     ...typography.body,
     color: colors.mutedText,
     marginTop: spacing.xs,
+  },
+  storyIntro: {
+    ...typography.caption,
+    color: colors.text,
+    marginTop: spacing.sm,
+    borderLeftWidth: 3,
+    borderLeftColor: colors.primary,
+    paddingLeft: spacing.sm,
   },
   progress: {
     ...typography.caption,

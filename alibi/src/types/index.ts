@@ -8,6 +8,7 @@ export interface Chapter {
   id: string;
   title: string;
   description: string;
+  storyIntro?: string;
   caseIds: string[];
 }
 
@@ -89,6 +90,8 @@ export interface CaseData {
   chapterId: string;
   title: string;
   description: string;
+  storyContext: string;
+  storyAftermath: string;
   crimeTime: string;
   crimeLocationId: string;
   suspects: Suspect[];

@@ -2,6 +2,7 @@ import { StyleSheet, Text, View } from 'react-native';
 
 import { Button } from '../components/Button';
 import { Card } from '../components/Card';
+import { campaignPremise } from '../data/cases';
 import { colors, spacing, typography } from '../theme';
 
 interface HomeScreenProps {
@@ -17,14 +18,14 @@ export const HomeScreen = ({ hintsAvailable, onPlay, onChapters, onSettings, onS
     <View style={styles.hero}>
       <Text style={styles.badge}>cozy mystery</Text>
       <Text style={styles.title}>Алиби</Text>
-      <Text style={styles.subtitle}>Детективная логическая головоломка о минутах, маршрутах и слишком удобных алиби.</Text>
+      <Text style={styles.subtitle}>Одна большая детективная история о фиолетовых приглашениях, минутах, маршрутах и слишком удобных алиби.</Text>
     </View>
 
     <Card style={styles.detectiveCard}>
       <Text style={styles.detective}>🕵️‍♀️</Text>
       <View style={styles.caseNote}>
-        <Text style={styles.caseNoteTitle}>Дело ждет</Text>
-        <Text style={styles.caseNoteText}>Сравнивай карту, время и улики. Виновен только тот, кто физически мог успеть.</Text>
+        <Text style={styles.caseNoteTitle}>Приглашение на убийство</Text>
+        <Text style={styles.caseNoteText}>{campaignPremise}</Text>
       </View>
     </Card>
 
