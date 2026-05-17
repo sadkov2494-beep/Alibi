@@ -3,17 +3,35 @@ import { StyleSheet, Text, View } from 'react-native';
 import { Button } from '../components/Button';
 import { Card } from '../components/Card';
 import { campaignPremise } from '../data/cases';
-import { colors, spacing, typography } from '../theme';
+import { borderRadius, colors, spacing, typography } from '../theme';
 
 interface HomeScreenProps {
   hintsAvailable: number;
+  solvedCases: number;
+  totalCases: number;
   onPlay: () => void;
   onChapters: () => void;
   onSettings: () => void;
   onShop: () => void;
 }
 
-export const HomeScreen = ({ hintsAvailable, onPlay, onChapters, onSettings, onShop }: HomeScreenProps) => (
+const getSeasonHook = (solvedCases: number) => {
+  if (solvedCases <= 0) {
+    return 'Аркадий мертв, дверь заперта изнутри, а его голос звучит после смерти.';
+  }
+
+  if (solvedCases === 1) {
+    return 'Мария была лишь первой фигурой. Где свидетель, который слышал голос настоящей Маски?';
+  }
+
+  if (solvedCases === 2) {
+    return 'Остался последний звонок. Кто управляет всеми исполнителями из тени?';
+  }
+
+  return 'Фиолетовый ужин раскрыт. Но клуб «Семь масок» мог быть только началом.';
+};
+
+export const HomeScreen = ({ hintsAvailable, solvedCases, totalCases, onPlay, onChapters, onSettings, onShop }: HomeScreenProps) => (
   <View style={styles.container}>
     <View style={styles.hero}>
       <Text style={styles.badge}>cozy mystery</Text>
@@ -27,6 +45,19 @@ export const HomeScreen = ({ hintsAvailable, onPlay, onChapters, onSettings, onS
         <Text style={styles.caseNoteTitle}>Приглашение на убийство</Text>
         <Text style={styles.caseNoteText}>{campaignPremise}</Text>
       </View>
+    </Card>
+
+    <Card highlighted>
+      <View style={styles.progressHeader}>
+        <Text style={styles.caseNoteTitle}>Тайна сезона</Text>
+        <Text style={styles.progressCount}>
+          {solvedCases}/{totalCases}
+        </Text>
+      </View>
+      <View style={styles.progressTrack}>
+        <View style={[styles.progressFill, { width: `${totalCases ? (solvedCases / totalCases) * 100 : 0}%` }]} />
+      </View>
+      <Text style={styles.caseNoteText}>{getSeasonHook(solvedCases)}</Text>
     </Card>
 
     <View style={styles.buttons}>
@@ -86,5 +117,27 @@ const styles = StyleSheet.create({
   },
   buttons: {
     gap: spacing.md,
+  },
+  progressHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    gap: spacing.md,
+  },
+  progressCount: {
+    ...typography.h2,
+    color: colors.primary,
+  },
+  progressTrack: {
+    height: 10,
+    borderRadius: borderRadius.pill,
+    backgroundColor: colors.backgroundSoft,
+    overflow: 'hidden',
+    marginVertical: spacing.md,
+  },
+  progressFill: {
+    height: '100%',
+    borderRadius: borderRadius.pill,
+    backgroundColor: colors.primary,
   },
 });

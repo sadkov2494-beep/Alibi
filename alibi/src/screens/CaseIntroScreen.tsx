@@ -25,6 +25,19 @@ export const CaseIntroScreen = ({ caseData, onBack, onStartInvestigation }: Case
       </View>
 
       <Card highlighted>
+        <Text style={styles.cardTitle}>Крючок серии</Text>
+        <Text style={styles.storyText}>{caseData.hook}</Text>
+        <View style={styles.objectiveBox}>
+          <Text style={styles.objectiveLabel}>Цель</Text>
+          <Text style={styles.objectiveText}>{caseData.objective}</Text>
+        </View>
+        <View style={styles.objectiveBox}>
+          <Text style={styles.objectiveLabel}>Ставки</Text>
+          <Text style={styles.objectiveText}>{caseData.stakes}</Text>
+        </View>
+      </Card>
+
+      <Card>
         <Text style={styles.cardTitle}>Нить сюжета</Text>
         <Text style={styles.storyText}>{caseData.storyContext}</Text>
       </Card>
@@ -120,5 +133,22 @@ const styles = StyleSheet.create({
   storyText: {
     ...typography.body,
     color: colors.text,
+  },
+  objectiveBox: {
+    marginTop: spacing.md,
+    borderLeftWidth: 3,
+    borderLeftColor: colors.primary,
+    paddingLeft: spacing.md,
+  },
+  objectiveLabel: {
+    ...typography.caption,
+    color: colors.primary,
+    fontWeight: '900',
+    textTransform: 'uppercase',
+  },
+  objectiveText: {
+    ...typography.body,
+    color: colors.text,
+    marginTop: spacing.xs,
   },
 });

@@ -25,8 +25,9 @@ export const ResultModal = ({ visible, isCorrect, stars, caseData, hintsUsed, on
           {isCorrect ? (
             <>
               <StarsRating stars={stars} />
+              <Text style={styles.subtitle}>Разоблачение</Text>
               <Text style={styles.text}>{caseData.explanation}</Text>
-              <Text style={styles.subtitle}>Нить сюжета</Text>
+              <Text style={styles.subtitle}>Клиффхэнгер</Text>
               <Text style={styles.text}>{caseData.storyAftermath}</Text>
               <Text style={styles.subtitle}>Кто исключается</Text>
               {caseData.exclusions.map((exclusion) => {

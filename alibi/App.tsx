@@ -113,6 +113,8 @@ export default function App() {
     return (
       <HomeScreen
         hintsAvailable={progress.hintsAvailable}
+        solvedCases={Object.values(progress.completedCases).filter((caseProgress) => caseProgress.solved).length}
+        totalCases={cases.length}
         onPlay={handlePlay}
         onChapters={() => setScreen('chapters')}
         onSettings={() => setScreen('settings')}

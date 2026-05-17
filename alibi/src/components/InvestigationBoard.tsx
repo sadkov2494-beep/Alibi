@@ -20,7 +20,18 @@ export const InvestigationBoard = ({ caseData }: InvestigationBoardProps) => (
   <View style={styles.wrap}>
     <Card highlighted>
       <Text style={styles.title}>Доска расследования</Text>
+      <Text style={styles.hook}>{caseData.hook}</Text>
       <Text style={styles.text}>{caseData.storyContext}</Text>
+      <View style={styles.goalRow}>
+        <View style={styles.goalCard}>
+          <Text style={styles.goalLabel}>Цель</Text>
+          <Text style={styles.goalText}>{caseData.objective}</Text>
+        </View>
+        <View style={styles.goalCard}>
+          <Text style={styles.goalLabel}>Ставки</Text>
+          <Text style={styles.goalText}>{caseData.stakes}</Text>
+        </View>
+      </View>
     </Card>
 
     {caseData.caseThreads.map((thread) => {
@@ -56,6 +67,34 @@ const styles = StyleSheet.create({
   text: {
     ...typography.body,
     color: colors.text,
+  },
+  hook: {
+    ...typography.body,
+    color: colors.primary,
+    fontWeight: '900',
+    marginBottom: spacing.sm,
+  },
+  goalRow: {
+    gap: spacing.sm,
+    marginTop: spacing.md,
+  },
+  goalCard: {
+    backgroundColor: colors.backgroundSoft,
+    borderRadius: borderRadius.md,
+    padding: spacing.md,
+    borderWidth: 1,
+    borderColor: colors.line,
+  },
+  goalLabel: {
+    ...typography.caption,
+    color: colors.primary,
+    fontWeight: '900',
+    textTransform: 'uppercase',
+  },
+  goalText: {
+    ...typography.caption,
+    color: colors.text,
+    marginTop: spacing.xs,
   },
   threadCard: {
     padding: spacing.md,

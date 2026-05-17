@@ -89,6 +89,18 @@ export interface Hint {
   text: string;
 }
 
+export interface DeductionOption {
+  id: string;
+  text: string;
+}
+
+export interface DeductionQuestion {
+  id: string;
+  prompt: string;
+  correctOptionId: string;
+  options: DeductionOption[];
+}
+
 export interface Exclusion {
   suspectId: string;
   reason: string;
@@ -99,6 +111,9 @@ export interface CaseData {
   chapterId: string;
   title: string;
   description: string;
+  hook: string;
+  objective: string;
+  stakes: string;
   storyContext: string;
   storyAftermath: string;
   crimeTime: string;
@@ -111,6 +126,7 @@ export interface CaseData {
   timelineEvents: TimelineEvent[];
   clues: Clue[];
   weapons: Weapon[];
+  deductionQuestions: DeductionQuestion[];
   correctSuspectId: string;
   correctWeaponId: string;
   explanation: string;

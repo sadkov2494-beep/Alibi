@@ -46,6 +46,7 @@ export const InvestigationScreen = ({
   const [activeTab, setActiveTab] = useState<InvestigationTab>('suspects');
   const [selectedSuspectId, setSelectedSuspectId] = useState<string>();
   const [selectedWeaponId, setSelectedWeaponId] = useState<string>();
+  const [selectedDeductionAnswers, setSelectedDeductionAnswers] = useState<Record<string, string>>({});
   const [attempts, setAttempts] = useState(0);
   const [revealedHints, setRevealedHints] = useState(0);
   const [resultVisible, setResultVisible] = useState(false);
@@ -56,6 +57,7 @@ export const InvestigationScreen = ({
     setActiveTab('suspects');
     setSelectedSuspectId(undefined);
     setSelectedWeaponId(undefined);
+    setSelectedDeductionAnswers({});
     setAttempts(0);
     setRevealedHints(0);
     setResultVisible(false);
@@ -83,7 +85,10 @@ export const InvestigationScreen = ({
     const nextAttempts = attempts + 1;
     setAttempts(nextAttempts);
 
-    const isCorrect = selectedSuspectId === caseData.correctSuspectId && selectedWeaponId === caseData.correctWeaponId;
+    const deductionsAreCorrect = caseData.deductionQuestions.every(
+      (question) => selectedDeductionAnswers[question.id] === question.correctOptionId,
+    );
+    const isCorrect = selectedSuspectId === caseData.correctSuspectId && selectedWeaponId === caseData.correctWeaponId && deductionsAreCorrect;
     setLastResultCorrect(isCorrect);
 
     if (isCorrect) {
@@ -141,8 +146,15 @@ export const InvestigationScreen = ({
           caseData={caseData}
           selectedSuspectId={selectedSuspectId}
           selectedWeaponId={selectedWeaponId}
+          selectedDeductionAnswers={selectedDeductionAnswers}
           onSelectSuspect={setSelectedSuspectId}
           onSelectWeapon={setSelectedWeaponId}
+          onSelectDeductionAnswer={(questionId, optionId) =>
+            setSelectedDeductionAnswers((current) => ({
+              ...current,
+              [questionId]: optionId,
+            }))
+          }
           onSubmit={handleSubmit}
         />
         <HintPanel
