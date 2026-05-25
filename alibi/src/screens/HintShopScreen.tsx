@@ -9,14 +9,15 @@ interface HintShopScreenProps {
   adsRemoved: boolean;
   onBack: () => void;
   onAddHints: (count: number) => void;
+  onWatchAd: () => void | Promise<void>;
 }
 
-export const HintShopScreen = ({ hintsAvailable, adsRemoved, onBack, onAddHints }: HintShopScreenProps) => (
+export const HintShopScreen = ({ hintsAvailable, adsRemoved, onBack, onAddHints, onWatchAd }: HintShopScreenProps) => (
   <ScrollView contentContainerStyle={styles.container}>
     <Button title="← Назад" onPress={onBack} variant="ghost" />
     <View>
       <Text style={styles.title}>Магазин подсказок</Text>
-      <Text style={styles.subtitle}>MVP использует локальные заглушки. Позже сюда можно подключить AdMob и in-app purchases.</Text>
+      <Text style={styles.subtitle}>Подсказки можно получить за просмотр рекламы Яндекса или в тестовом наборе.</Text>
     </View>
 
     <Card highlighted>
@@ -28,8 +29,13 @@ export const HintShopScreen = ({ hintsAvailable, adsRemoved, onBack, onAddHints 
       <Card>
         <Text style={styles.offerIcon}>🎬</Text>
         <Text style={styles.offerTitle}>Вознаграждаемая реклама</Text>
-        <Text style={styles.text}>Заглушка: кнопка сразу добавляет одну подсказку.</Text>
-        <Button title="Посмотреть рекламу (+1)" onPress={() => onAddHints(1)} variant="secondary" />
+        <Text style={styles.text}>После просмотра ролика вы получите одну подсказку.</Text>
+        <Button
+          title={adsRemoved ? 'Реклама отключена' : 'Посмотреть рекламу (+1)'}
+          onPress={() => void onWatchAd()}
+          disabled={adsRemoved}
+          variant="secondary"
+        />
       </Card>
 
       <Card>

@@ -1,9 +1,10 @@
 import { StatusBar } from 'expo-status-bar';
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
 import { cases, getCaseById, getNextCaseId } from './src/data/cases';
+import { showRewardedAdForHint } from './src/services/rewardedAds';
 import { useProgress } from './src/state/useProgress';
 import { colors, spacing, typography } from './src/theme';
 import { ScreenName } from './src/types';
@@ -43,6 +44,17 @@ export default function App() {
     openCase(firstOpenUnsolved.id);
   };
 
+  const handleWatchAd = useCallback(async () => {
+    if (progress.adsRemoved) {
+      return;
+    }
+
+    const rewarded = await showRewardedAdForHint();
+    if (rewarded) {
+      addHints(1);
+    }
+  }, [addHints, progress.adsRemoved]);
+
   const renderScreen = () => {
     if (!isLoaded) {
       return (
@@ -77,7 +89,7 @@ export default function App() {
           hintsAvailable={progress.hintsAvailable}
           onBack={() => setScreen('caseIntro')}
           onSpendHint={spendHint}
-          onWatchAd={() => addHints(1)}
+          onWatchAd={handleWatchAd}
           onSolved={(stars, attempts, hintsUsed) => completeCase(selectedCase.id, stars, attempts, hintsUsed)}
           onNextCase={onNextCase}
         />
@@ -106,6 +118,7 @@ export default function App() {
           adsRemoved={progress.adsRemoved}
           onBack={() => setScreen('home')}
           onAddHints={addHints}
+          onWatchAd={handleWatchAd}
         />
       );
     }
